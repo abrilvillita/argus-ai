@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+
+# Data
+backend/argus.db
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

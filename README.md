@@ -48,6 +48,8 @@ Anyone — not just whoever wrote the backend — can define response logic from
 
 ![No-code rule builder configuring an auto-shutdown rule, with live anomaly spikes on the chart](docs/screenshots/rule-builder-and-alerts.png)
 
+A short demo clip is also included at [`docs/screenshots/argus-ai-demo.mp4`](docs/screenshots/argus-ai-demo.mp4).
+
 ### Cloud-ready
 
 - `backend/Dockerfile` + `docker-compose.yml` — run the whole stack in one container.

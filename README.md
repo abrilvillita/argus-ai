@@ -6,6 +6,8 @@ Argus AI is a no-code IoT anomaly detection and auto-remediation platform. Point
 
 Built for the **DevNetwork API/Cloud/AI Hackathon 2026** — spanning the IoT, Low/No-Code, and Machine Learning/AI tracks.
 
+**Live demo: [LIVE_URL_PLACEHOLDER](LIVE_URL_PLACEHOLDER)** — deployed with the self-seeding demo fleet on, so you'll see live telemetry and anomalies within seconds of loading it. No sign-up required.
+
 ![Argus AI dashboard — live telemetry, fleet status, no-code rule builder, and the alert log](docs/screenshots/dashboard-overview.png)
 
 ## The problem
@@ -87,6 +89,8 @@ python simulate.py --backend http://localhost:8000 --devices 4
 ```
 
 Then, from the dashboard, add a rule (e.g. `temperature greater than 60 → Shutdown device`) and watch the simulator's injected spikes trigger both the AI detector and your rule in the live alert feed.
+
+The backend also self-seeds a small demo fleet on startup (so a fresh deploy is never a blank dashboard) — a starter "Furnace overheat" rule is pre-created too. Set `ARGUS_DEMO_SEED=0` to disable the built-in seeder if you'd rather only see your own `simulator/simulate.py` traffic or real device data.
 
 ### Docker
 

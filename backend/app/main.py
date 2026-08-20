@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 from pathlib import Path
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
@@ -10,6 +11,7 @@ from fastapi.staticfiles import StaticFiles
 
 from . import db
 from .anomaly import engine
+from .demo import run_demo_seed
 from .models import OPERATORS, RuleIn, TelemetryIn
 
 app = FastAPI(title="Argus AI", description="No-code IoT anomaly detection & auto-remediation")
@@ -48,30 +50,18 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
-@app.on_event("startup")
-def on_startup() -> None:
-    db.init_db()
-
-
-@app.post("/api/telemetry")
-async def post_telemetry(reading: TelemetryIn):
-    ts = db.insert_telemetry(reading.device_id, reading.metric, reading.value)
+async def ingest_reading(device_id: str, metric: str, value: float) -> dict:
+    ts = db.insert_telemetry(device_id, metric, value)
     await manager.broadcast(
-        {
-            "type": "telemetry",
-            "device_id": reading.device_id,
-            "metric": reading.metric,
-            "value": reading.value,
-            "created_at": ts,
-        }
+        {"type": "telemetry", "device_id": device_id, "metric": metric, "value": value, "created_at": ts}
     )
 
-    anomaly = engine.observe(reading.device_id, reading.metric, reading.value)
+    anomaly = engine.observe(device_id, metric, value)
     triggered_alerts = []
 
     if anomaly is not None:
         alert = db.insert_alert(
-            reading.device_id, reading.metric, reading.value,
+            device_id, metric, value,
             source=anomaly["source"], message=anomaly["message"], action_taken="notify",
         )
         triggered_alerts.append(alert)
@@ -79,16 +69,16 @@ async def post_telemetry(reading: TelemetryIn):
     for rule in db.list_rules():
         if not rule["enabled"]:
             continue
-        if rule["device_id"] not in ("*", reading.device_id):
+        if rule["device_id"] not in ("*", device_id):
             continue
-        if rule["metric"] != reading.metric:
+        if rule["metric"] != metric:
             continue
         op = OPERATORS[rule["operator"]]
-        if op(reading.value, rule["threshold"]):
+        if op(value, rule["threshold"]):
             alert = db.insert_alert(
-                reading.device_id, reading.metric, reading.value,
+                device_id, metric, value,
                 source=f"rule:{rule['name']}",
-                message=f"Rule '{rule['name']}' matched: {reading.metric} {rule['operator']} {rule['threshold']}",
+                message=f"Rule '{rule['name']}' matched: {metric} {rule['operator']} {rule['threshold']}",
                 action_taken=rule["action"],
             )
             triggered_alerts.append(alert)
@@ -97,6 +87,20 @@ async def post_telemetry(reading: TelemetryIn):
         await manager.broadcast({"type": "alert", **alert})
 
     return {"ok": True, "anomaly": anomaly is not None, "alerts_triggered": len(triggered_alerts)}
+
+
+@app.on_event("startup")
+async def on_startup() -> None:
+    db.init_db()
+    if not db.list_rules():
+        db.create_rule("Furnace overheat", "furnace-01", "temperature", "gt", 65, "shutdown_device")
+    if os.environ.get("ARGUS_DEMO_SEED", "1") != "0":
+        asyncio.create_task(run_demo_seed(ingest_reading))
+
+
+@app.post("/api/telemetry")
+async def post_telemetry(reading: TelemetryIn):
+    return await ingest_reading(reading.device_id, reading.metric, reading.value)
 
 
 @app.get("/api/devices")

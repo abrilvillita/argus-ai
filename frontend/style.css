@@ -103,7 +103,7 @@ body {
 .device-card .metric-row { display: flex; justify-content: space-between; color: var(--muted); margin-top: 4px; }
 .device-card .metric-row span:last-child { color: var(--text); }
 
-.chart-tabs { display: flex; gap: 8px; margin-bottom: 10px; }
+.chart-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
 .chart-tabs button {
   background: #0e1420;
   color: var(--muted);
@@ -112,6 +112,8 @@ body {
   padding: 6px 12px;
   font-size: 12.5px;
   cursor: pointer;
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 .chart-tabs button.active { color: var(--bg); background: var(--accent); border-color: var(--accent); }
 

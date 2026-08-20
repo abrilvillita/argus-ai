@@ -6,7 +6,7 @@ Argus AI is a no-code IoT anomaly detection and auto-remediation platform. Point
 
 Built for the **DevNetwork API/Cloud/AI Hackathon 2026** — spanning the IoT, Low/No-Code, and Machine Learning/AI tracks.
 
-**Live demo: [LIVE_URL_PLACEHOLDER](LIVE_URL_PLACEHOLDER)** — deployed with the self-seeding demo fleet on, so you'll see live telemetry and anomalies within seconds of loading it. No sign-up required.
+**Live demo: [argus-ai-5n2k.onrender.com](https://argus-ai-5n2k.onrender.com)** — deployed with the self-seeding demo fleet on, so you'll see live telemetry and anomalies within seconds of loading it. No sign-up required. (Free-tier hosting: the first request after a period of inactivity can take ~30-50s to wake the instance up.)
 
 ![Argus AI dashboard — live telemetry, fleet status, no-code rule builder, and the alert log](docs/screenshots/dashboard-overview.png)
 

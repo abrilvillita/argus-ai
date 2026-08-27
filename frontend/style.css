@@ -94,6 +94,7 @@ body {
   border-radius: 14px;
   padding: 16px 18px;
   min-width: 0;
+  overflow: hidden;
   background: linear-gradient(145deg, #101e1c, var(--panel));
   box-shadow: 0 16px 45px rgba(0,0,0,.12);
 }
@@ -156,6 +157,8 @@ body {
 
 #rule-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
 #rule-form input, #rule-form select {
+  width: 100%;
+  min-width: 0;
   background: #0e1420;
   border: 1px solid var(--panel-border);
   color: var(--text);
@@ -173,6 +176,8 @@ body {
   padding: 9px;
   border-radius: 8px;
   cursor: pointer;
+  width: 100%;
+  min-width: 0;
 }
 #rule-form button:disabled { opacity: .55; cursor: wait; }
 
@@ -183,6 +188,8 @@ body {
   border-radius: 8px;
   padding: 8px 10px;
   font-size: 12.5px;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .rule-list li button { float: right; background: none; border: none; color: var(--danger); cursor: pointer; }
 

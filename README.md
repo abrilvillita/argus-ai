@@ -8,6 +8,8 @@ Built for the **DevNetwork API/Cloud/AI Hackathon 2026** — spanning the IoT, L
 
 **Live demo: [argus-ai-5n2k.onrender.com](https://argus-ai-5n2k.onrender.com)** — deployed with the self-seeding demo fleet on, so you'll see live telemetry and anomalies within seconds of loading it. No sign-up required. (Free-tier hosting: the first request after a period of inactivity can take ~30-50s to wake the instance up.)
 
+> The dashboard is judge-ready: it explains the detect → decide → act loop, shows live impact metrics, retries automatically while a free Render instance wakes up, and exposes `/api/health` for deployment monitoring.
+
 ![Argus AI dashboard — live telemetry, fleet status, no-code rule builder, and the alert log](docs/screenshots/dashboard-overview.png)
 
 ## The problem
@@ -98,6 +100,12 @@ The backend also self-seeds a small demo fleet on startup (so a fresh deploy is 
 docker compose up --build
 # dashboard at http://localhost:8000
 ```
+
+### Deploy to Render
+
+The repository includes a Render Blueprint (`render.yaml`) and a container health check. In Render, choose **New → Blueprint**, connect this repository, and deploy. Render will build the Docker image, monitor `/api/health`, enable the self-seeding demo fleet, and automatically deploy future commits to `main`.
+
+For persistent SQLite data on a paid service, attach a disk mounted at `/var/data` and set `ARGUS_DB_PATH=/var/data/argus.db`. The public demo intentionally works without a disk so it remains zero-configuration.
 
 ### Deploying to AWS Lambda
 

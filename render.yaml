@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: argus-ai
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: ARGUS_DEMO_SEED
+        value: "1"
+      - key: PYTHONUNBUFFERED
+        value: "1"

@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Argus AI — No-Code IoT Anomaly Detection</title>
-  <link rel="stylesheet" href="style.css?v=3" />
+  <link rel="stylesheet" href="style.css?v=4" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -16,23 +16,41 @@
         <p>No-code IoT anomaly detection &amp; auto-remediation</p>
       </div>
     </div>
-    <div class="status" id="ws-status">connecting…</div>
+    <div class="header-actions">
+      <a href="/docs" target="_blank" rel="noreferrer">API docs</a>
+      <div class="status" id="ws-status">connecting…</div>
+    </div>
   </header>
+
+  <section class="hero">
+    <div><p class="eyebrow">LIVE AUTONOMOUS OPERATIONS</p><h2>Detect. Decide. Act.</h2>
+      <p>Streaming AI learns every device's normal behavior, catches anomalies, and applies no-code remediation rules in real time.</p></div>
+    <div class="flow"><span>IoT fleet</span><b>→</b><span>AI detection</span><b>→</b><span>Auto-remediation</span></div>
+  </section>
+
+  <section class="kpis" aria-label="Live system metrics">
+    <div><strong id="stat-devices">—</strong><span>devices online</span></div>
+    <div><strong id="stat-readings">—</strong><span>readings analyzed</span></div>
+    <div><strong id="stat-alerts">—</strong><span>incidents caught</span></div>
+    <div><strong id="stat-rules">—</strong><span>active rules</span></div>
+  </section>
+  <div id="app-message" class="app-message" role="status">Waking the live demo and loading telemetry…</div>
 
   <main class="grid">
     <section class="panel devices">
-      <h2>Fleet</h2>
+      <div class="panel-title"><h2>Fleet</h2><span id="fleet-health">Discovering…</span></div>
       <div id="device-list" class="device-list"></div>
     </section>
 
     <section class="panel charts">
-      <h2>Live telemetry</h2>
+      <div class="panel-title"><h2>Live telemetry</h2><span>last 100 readings</span></div>
       <div class="chart-tabs" id="chart-tabs"></div>
-      <canvas id="metric-chart" height="140"></canvas>
+      <div class="chart-wrap"><canvas id="metric-chart"></canvas></div>
     </section>
 
     <section class="panel rules">
-      <h2>No-code rule builder</h2>
+      <div class="panel-title"><h2>No-code rule builder</h2><span>no deploy required</span></div>
+      <p class="panel-copy">Choose a condition and Argus applies the response to every matching live reading.</p>
       <form id="rule-form">
         <input name="name" placeholder="Rule name (e.g. Furnace overheat)" required />
         <select name="device_id" id="rule-device"><option value="*">Any device</option></select>
@@ -54,17 +72,18 @@
           <option value="shutdown_device">Shutdown device</option>
           <option value="dispatch_technician">Dispatch technician</option>
         </select>
-        <button type="submit">+ Add rule</button>
+        <button type="submit">Create automation</button>
       </form>
       <ul id="rule-list" class="rule-list"></ul>
     </section>
 
     <section class="panel alerts">
-      <h2>Alerts &amp; auto-remediation log</h2>
+      <div class="panel-title"><h2>Incident timeline</h2><span>AI + rules</span></div>
       <ul id="alert-list" class="alert-list"></ul>
     </section>
   </main>
 
-  <script src="app.js"></script>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="app.js?v=4"></script>
 </body>
 </html>

@@ -1,9 +1,10 @@
+import os
 import sqlite3
 import time
 from pathlib import Path
 from typing import Any
 
-DB_PATH = Path(__file__).resolve().parent.parent / "argus.db"
+DB_PATH = Path(os.environ.get("ARGUS_DB_PATH", Path(__file__).resolve().parent.parent / "argus.db"))
 
 
 def get_conn() -> sqlite3.Connection:
@@ -13,6 +14,7 @@ def get_conn() -> sqlite3.Connection:
 
 
 def init_db() -> None:
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     conn = get_conn()
     conn.executescript(
         """
@@ -161,3 +163,15 @@ def delete_rule(rule_id: int) -> None:
     conn.execute("DELETE FROM rules WHERE id = ?", (rule_id,))
     conn.commit()
     conn.close()
+
+
+def get_stats() -> dict[str, Any]:
+    conn = get_conn()
+    devices = conn.execute("SELECT COUNT(DISTINCT device_id) FROM telemetry").fetchone()[0]
+    readings = conn.execute("SELECT COUNT(*) FROM telemetry").fetchone()[0]
+    alerts = conn.execute("SELECT COUNT(*) FROM alerts").fetchone()[0]
+    rules = conn.execute("SELECT COUNT(*) FROM rules WHERE enabled = 1").fetchone()[0]
+    last_reading = conn.execute("SELECT MAX(created_at) FROM telemetry").fetchone()[0]
+    conn.close()
+    return {"devices": devices, "readings": readings, "alerts": alerts,
+            "active_rules": rules, "last_reading_at": last_reading}

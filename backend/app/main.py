@@ -108,6 +108,16 @@ def get_devices():
     return db.list_devices()
 
 
+@app.get("/api/health")
+def health():
+    return {"status": "ok", "service": "argus-ai"}
+
+
+@app.get("/api/stats")
+def get_stats():
+    return db.get_stats()
+
+
 @app.get("/api/telemetry/{device_id}/{metric}")
 def get_telemetry(device_id: str, metric: str, limit: int = 200):
     return db.recent_telemetry(device_id, metric, limit)

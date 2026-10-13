@@ -2,7 +2,7 @@
 
 **Give your IoT fleet a thousand eyes.**
 
-Argus AI is a no-code IoT anomaly detection and auto-remediation platform. Point it at any device telemetry stream, and it learns what "normal" looks like per device — no training data, no ML expertise, no config files — then flags the moment something drifts, and lets anyone on the team wire up an automatic response through a plain web form, not a Python script.
+Argus AI is a hackathon prototype for IoT anomaly detection and rule-based response logging. It learns a baseline from incoming demo telemetry and records matched actions. The current code does not send commands to physical devices or dispatch people.
 
 Built for the **DevNetwork API/Cloud/AI Hackathon 2026** — spanning the IoT, Low/No-Code, and Machine Learning/AI tracks.
 
@@ -16,7 +16,7 @@ Built for the **DevNetwork API/Cloud/AI Hackathon 2026** — spanning the IoT, L
 
 Industrial and IoT teams drown in sensor dashboards but starve for *action*. Setting a static threshold ("alert if temp > 80°C") misses slow degradation and multi-sensor faults; building a real anomaly-detection pipeline usually means a data scientist, a training dataset, and a deploy pipeline most small teams don't have. And even after an anomaly is found, turning that signal into an automatic response (throttle it, shut it down, page someone) still means writing and shipping code.
 
-Argus AI collapses that whole chain into one running service: **stream in → AI flags the anomaly → no-code rule decides what to do about it → action is logged.**
+The current demo shows this loop: **stream in → detector flags an anomaly → rule matches → proposed action is logged.** It does not execute the proposed action.
 
 ## How it works
 
@@ -32,7 +32,7 @@ flowchart LR
     API --> RULES[No-code rule engine]
     AI -->|flag| ALERTS[(Alerts &<br/>remediation log)]
     RULES -->|match| ALERTS
-    RULES -->|action| ACT[notify / throttle /<br/>shutdown / dispatch]
+    RULES -->|action label| ACT[proposed notify / throttle /<br/>shutdown / dispatch]
     API -->|WebSocket push| DASH[Live dashboard]
     ALERTS --> DASH
 ```
@@ -90,7 +90,7 @@ pip install -r requirements.txt
 python simulate.py --backend http://localhost:8000 --devices 4
 ```
 
-Then, from the dashboard, add a rule (e.g. `temperature greater than 60 → Shutdown device`) and watch the simulator's injected spikes trigger both the AI detector and your rule in the live alert feed.
+Then, from the dashboard, add a rule (e.g. `temperature greater than 60 → Shutdown device`) and watch the simulator's injected spikes produce a **logged** action in the live alert feed. No device is shut down.
 
 The backend also self-seeds a small demo fleet on startup (so a fresh deploy is never a blank dashboard) — a starter "Furnace overheat" rule is pre-created too. Set `ARGUS_DEMO_SEED=0` to disable the built-in seeder if you'd rather only see your own `simulator/simulate.py` traffic or real device data.
 
@@ -142,6 +142,10 @@ argus-ai/
 - Per-metric confidence scores surfaced in the dashboard, not just a binary flag
 - Swap SQLite for a managed database and deploy the reference Lambda stack
 - Auth + multi-tenant fleets
+
+## Public demo security boundary
+
+The hosted demo has no authentication and allows visitors to submit telemetry and create or delete rules. Treat every reading and rule as untrusted, disposable demonstration data. Do not connect real devices, use it for industrial decisions, enter private telemetry or expose it as a production control panel. The `notify`, `throttle_device`, `shutdown_device` and `dispatch_technician` values are labels written to the alert log; no external action is implemented. Production use needs authentication, authorization, per-client rate limits, origin controls, durable storage, monitoring and a separate safety review.
 
 ## License
 

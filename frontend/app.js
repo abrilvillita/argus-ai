@@ -7,6 +7,9 @@ const state = {
 };
 
 const compact = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
+const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, ch => ({
+  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+})[ch]);
 
 async function jsonFetch(url, options) {
   const response = await fetch(url, options);
@@ -59,9 +62,9 @@ function handleAlert(msg) {
   const li = document.createElement("li");
   li.className = msg.source && msg.source.startsWith("rule:") ? "" : "anomaly";
   const when = new Date(msg.created_at * 1000).toLocaleTimeString();
-  li.innerHTML = `<strong>${msg.device_id}</strong> — ${msg.message}` +
-    (msg.action_taken ? ` <em>(action: ${msg.action_taken})</em>` : "") +
-    `<span class="time">${when} · source: ${msg.source}</span>`;
+  li.innerHTML = `<strong>${escapeHTML(msg.device_id)}</strong> — ${escapeHTML(msg.message)}` +
+    (msg.action_taken ? ` <em>(action logged: ${escapeHTML(msg.action_taken)})</em>` : "") +
+    `<span class="time">${escapeHTML(when)} · source: ${escapeHTML(msg.source)}</span>`;
   list.prepend(li);
   while (list.children.length > 50) list.removeChild(list.lastChild);
 }
@@ -81,9 +84,9 @@ function renderDevices() {
     const card = document.createElement("div");
     card.className = "device-card";
     const rows = Object.entries(metrics).map(([m, d]) =>
-      `<div class="metric-row"><span>${m}</span><span>${d.value.toFixed(2)}</span></div>`
+      `<div class="metric-row"><span>${escapeHTML(m)}</span><span>${Number(d.value).toFixed(2)}</span></div>`
     ).join("");
-    card.innerHTML = `<div class="name">${deviceId}</div>${rows}`;
+    card.innerHTML = `<div class="name">${escapeHTML(deviceId)}</div>${rows}`;
     container.appendChild(card);
   });
   const count = Object.keys(state.devices).length;
@@ -158,7 +161,7 @@ function renderRules(rules) {
   list.innerHTML = "";
   rules.forEach((r) => {
     const li = document.createElement("li");
-    li.innerHTML = `<button data-id="${r.id}">✕</button>${r.name}: ${r.device_id} ${r.metric} ${r.operator} ${r.threshold} → ${r.action}`;
+    li.innerHTML = `<button data-id="${Number(r.id)}">✕</button>${escapeHTML(r.name)}: ${escapeHTML(r.device_id)} ${escapeHTML(r.metric)} ${escapeHTML(r.operator)} ${Number(r.threshold)} → ${escapeHTML(r.action)}`;
     li.querySelector("button").onclick = async () => {
       if (!confirm(`Delete rule “${r.name}”?`)) return;
       await jsonFetch(`${API}/api/rules/${r.id}`, { method: "DELETE" });
